@@ -10,8 +10,9 @@ func main() {
 	fmt.Println(calc(data()))
 }
 
+// data : Get the data from the file and parse it into []int
 func data() []int {
-	data, _ := ioutil.ReadFile("./data.txt")
+	data, _ := ioutil.ReadFile("./FuelRequirement.txt")
 	array := strings.SplitAfter(string(data), "\n")
 	var val int
 	var value []int
@@ -22,6 +23,7 @@ func data() []int {
 	return value
 }
 
+// calc : Calculate the fuel needed for first stage
 func calc(data []int) int {
 	var sum int
 	for _, v := range data {
