@@ -7,42 +7,36 @@ import (
 )
 
 func main() {
-	// get the data from the function
-	data := data()
-
-	// Change the first 2 values according to the text
+	file := "instructions.txt"
+	data := data(file)
 	data[1] = 12
 	data[2] = 2
 
-	// Loop through the operations
 	for i := 0; i <= len(data); i += 4 {
 		// Create pointers to places of the array to simplify operations
 		p := &data[0]
-		operand := &data[i]
-		input1 := &data[data[i+1]]
-		input2 := &data[data[i+2]]
+		opcode := &data[i]
+		param1 := &data[data[i+1]]
+		param2 := &data[data[i+2]]
 		storage := &data[data[i+3]]
 
-		// Check the operand and make the operation
+		// Check the opcode and make the operation
 		switch {
-		case *operand == 1:
-			*storage = *input1 + *input2
-		case *operand == 2:
-			*storage = *input1 * *input2
-		case *operand == 99:
+		case *opcode == 1:
+			*storage = *param1 + *param2
+		case *opcode == 2:
+			*storage = *param1 * *param2
+		case *opcode == 99:
 			fmt.Printf("Value on index 0 is %d\n", *p)
 			i = len(data)
 		}
 	}
 }
 
-func data() []int {
-	// Init variables
+func data(file string) []int {
 	var value []int
 	var val int
-
-	// Read File
-	data, _ := ioutil.ReadFile("instructions.txt")
+	data, _ := ioutil.ReadFile(file)
 	array := strings.SplitAfter(string(data), ",")
 
 	// Parse array to []int

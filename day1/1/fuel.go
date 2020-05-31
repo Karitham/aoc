@@ -7,28 +7,31 @@ import (
 )
 
 func main() {
-	fmt.Println(calc(data()))
+	file := "FuelRequirement.txt"
+	data := data(file)
+	var sum int
+
+	// Make the math
+	for _, v := range data {
+		v = v/3 - 2
+		sum += v
+	}
+
+	// Print the answer
+	fmt.Printf("The answer is %d", sum)
 }
 
-// data : Get the data from the file and parse it into []int
-func data() []int {
-	data, _ := ioutil.ReadFile("./FuelRequirement.txt")
-	array := strings.SplitAfter(string(data), "\n")
+// Get the data turn it into an []int
+func data(file string) []int {
 	var val int
 	var value []int
+	data, _ := ioutil.ReadFile(file)
+	array := strings.SplitAfter(string(data), "\n")
+
+	// Parse the []string as an []int
 	for _, v := range array {
 		fmt.Sscanf(v, "%d", &val)
 		value = append(value, val)
 	}
 	return value
-}
-
-// calc : Calculate the fuel needed for first stage
-func calc(data []int) int {
-	var sum int
-	for _, v := range data {
-		v = v/3 - 2
-		sum += v
-	}
-	return sum
 }
