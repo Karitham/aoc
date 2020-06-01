@@ -14,13 +14,13 @@ func main() {
 	// Make the program test each answer until it finds one that fits
 	for result != givenResult && verb <= 99 && noun <= 99 {
 		result = compute(data(file), noun, verb)
+		if result == givenResult {
+			fmt.Printf("Houston, the result are :\nnoun = %d,\nverb = %d,\nanswer = %d", noun, verb, 100*noun+verb)
+		}
 		noun++
 		if result > givenResult {
 			noun -= 2
 			verb++
-		}
-		if result == givenResult {
-			fmt.Printf("Houston, the result are :\nnoun = %d,\nverb = %d,\nanswer = %d", noun, verb, 100*noun+verb)
 		}
 	}
 	if result > givenResult {
