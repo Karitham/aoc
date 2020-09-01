@@ -1,13 +1,9 @@
-# Advent Of Code 2019
+# Advent of code
 
-So I decided I was going to do the Advent of Code 2019 even tho I'm late because I didn't know it existed and I don't have anything better to do.
+A repo where I host the different AOC challenges I try, some work, some don't
 
-You can find the Advent Of Code website [here](https://adventofcode.com/2019)
+These coding challenges are a fun way for me to explore new languages and just try my hands on something that may not be easy.
 
-## Language
+I plan to do all the future challenges and will host them here
 
-I'm trying to learn Golang, so I'm doing this in Go.
-
-I might do this in another language (probably rust because I want to try my hand at it) if I can.
-
-I will try to participate in the next one, and might also do the 2018 one.
+Theses solutions are by no means the best ways. Some might only work for my input sets, some might be slow.

@@ -7,31 +7,18 @@ import (
 )
 
 func main() {
-	file := "../1/FuelRequirement.txt"
-	var fuelsize, sum int
-	sum = fuelsize
+	file := "../../inputs/day1.txt"
 	data := data(file)
+	var sum int
 
-	// Recursively call the math function to calculate the fuel needed
+	// Make the math
 	for _, v := range data {
-		fuelsize = v
-		for fuelsize > 0 {
-			fuelsize = math(fuelsize)
-			sum = sum + fuelsize
-		}
+		v = v/3 - 2
+		sum += v
 	}
 
 	// Print the answer
-	fmt.Printf("The sum is %d", sum)
-}
-
-// Quick math
-func math(x int) int {
-	x = x/3 - 2
-	if x > 0 {
-		return x
-	}
-	return 0
+	fmt.Printf("The answer is %d", sum)
 }
 
 // Get the data turn it into an []int
