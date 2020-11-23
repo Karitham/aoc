@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	file := "../../inputs/day2.txt"
+	file := "../inputs/day2.txt"
 	givenResult := 19690720
 	var verb, noun, result int
 

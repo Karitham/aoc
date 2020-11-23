@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	file := "../../inputs/day2.txt"
+	file := "../inputs/day2.txt"
 	data := data(file)
 	data[1] = 12
 	data[2] = 2

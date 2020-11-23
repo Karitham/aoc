@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	file := "../../inputs/day1.txt"
+	file := "../inputs/day1.txt"
 	var fuelsize, sum int
 	sum = fuelsize
 	data := data(file)
