@@ -9,3 +9,4 @@ You can find the Advent Of Code website [here](https://adventofcode.com/2019).
 | day0201 | Y       | Go       |
 | day0202 | Y       | Go       |
 | day0301 | Y       | Rust     |
+| day0302 | Y       | Rust     |

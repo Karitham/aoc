@@ -1,4 +1,4 @@
-use std::{collections::HashSet, str::FromStr};
+use std::{collections::HashMap, str::FromStr};
 
 struct Instruction {
     direction: Direction,
@@ -30,10 +30,6 @@ impl Point {
             Direction::Down => self.y -= 1,
         };
     }
-
-    fn manhattan(&self) -> u64 {
-        self.x.abs() as u64 + self.y.abs() as u64
-    }
 }
 
 impl FromStr for Instruction {
@@ -56,30 +52,31 @@ impl FromStr for Instruction {
     }
 }
 
-fn to_vec(line: &str) -> Vec<Instruction> {
-    line.rsplit(',')
-        .rev()
-        .map(|instruction| Instruction::from_str(instruction).unwrap())
-        .collect()
-}
+fn to_map(wire: Vec<Instruction>) -> HashMap<Point, u64> {
+    let mut map: HashMap<Point, u64> = HashMap::new();
+    let mut point: Point = Point::new(0, 0);
+    let mut move_count: u64 = 0;
 
-impl Instruction {
-    fn to_set(wire: &Vec<Instruction>) -> HashSet<Point> {
-        let mut set: HashSet<Point> = HashSet::new();
-        let mut point: Point = Point::new(0, 0);
+    for instruction in &wire {
+        for _ in 0..instruction.length {
+            point.move_one(&instruction.direction);
+            move_count += 1;
 
-        for inst in wire {
-            for _ in 0..inst.length {
-                point.move_one(&inst.direction);
-                set.insert(point);
-            }
+            map.insert(point, move_count);
         }
-
-        set
     }
+
+    map
 }
 
 fn get_input(filename: &str) -> (Vec<Instruction>, Vec<Instruction>) {
+    fn to_vec(line: &str) -> Vec<Instruction> {
+        line.rsplit(',')
+            .rev()
+            .map(|instruction| Instruction::from_str(instruction).unwrap())
+            .collect()
+    }
+
     let contents =
         std::fs::read_to_string(filename).expect("Something went wrong reading the file");
 
@@ -91,22 +88,29 @@ fn get_input(filename: &str) -> (Vec<Instruction>, Vec<Instruction>) {
     )
 }
 
-fn crosses(w1: Vec<Instruction>, w2: Vec<Instruction>) -> Vec<Point> {
-    let set_1 = Instruction::to_set(&w1);
-    let set_2 = Instruction::to_set(&w2);
+fn get_signal(wire_1: &HashMap<Point, u64>, wire_2: &HashMap<Point, u64>) -> HashMap<Point, u64> {
+    let mut results: HashMap<Point, u64> = HashMap::new();
 
-    set_1.intersection(&set_2).cloned().collect()
+    for (elem, length) in wire_1.into_iter() {
+        if wire_2.contains_key(elem) {
+            results.insert(*elem, length + wire_2.get(elem).unwrap());
+        }
+    }
+
+    results
 }
 
 fn main() {
-    let (w1, w2) = get_input("../../inputs/day3.txt");
+    let (wire_1, wire_2) = get_input("../../inputs/day3.txt");
 
-    let crossing_points = crosses(w1, w2);
+    let w1 = to_map(wire_1);
+    let w2 = to_map(wire_2);
 
-    let lowest = match crossing_points.iter().map(Point::manhattan).min() {
+    let signals = get_signal(&w1, &w2);
+    let smallest = match signals.into_iter().map(|tuple| tuple.1).min() {
         Some(v) => v,
-        None => panic!("No points cross themselves"),
+        None => 0,
     };
 
-    println!("closest intersection to the center is {}", lowest)
+    println!("The smallest signal is {}", smallest);
 }
