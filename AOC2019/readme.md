@@ -11,3 +11,4 @@ You can find the Advent Of Code website [here](https://adventofcode.com/2019).
 | day0301 | Y       | Rust     |
 | day0302 | Y       | Rust     |
 | day0401 | Y       | Rust     |
+| day0402 | Y       | Rust     |
