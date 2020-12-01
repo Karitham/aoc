@@ -5,8 +5,10 @@ fn main() {
 
     for i in 0..len {
         for j in i..len {
-            if args[i] + args[j] == 2020 {
-                println!("{}", args[i] * args[j]);
+            for k in j..len {
+                if args[i] + args[j] + args[k] == 2020 {
+                    println!("{}", args[i] * args[j] * args[k]);
+                }
             }
         }
     }
