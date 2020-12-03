@@ -8,3 +8,5 @@ You can find the Advent Of Code website [here](https://adventofcode.com/2020).
 | day0102 | Y       | Rust     |
 | day0201 | Y       | Rust     |
 | day0202 | Y       | Rust     |
+| day0301 | Y       | Rust     |
+| day0302 | Y       | Rust     |
