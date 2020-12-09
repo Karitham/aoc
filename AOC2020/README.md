@@ -16,3 +16,6 @@ You can find the Advent Of Code website [here](https://adventofcode.com/2020).
 | day0502 | Y       | Rust     |
 | day0601 | Y       | Rust     |
 | day0602 | Y       | Rust     |
+| day0701 | N       | Rust     |
+| day0702 | N       | Rust     |
+| day0801 | Y       | Rust     |
