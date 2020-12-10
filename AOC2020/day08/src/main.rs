@@ -8,10 +8,11 @@ fn main() {
         .map(|sub| sub.parse::<Inst>().unwrap())
         .collect::<Vec<Inst>>();
 
-    println!("part one: {:?}", part_one(inst))
+    println!("part one: {:?}", part_one(&inst).0);
+    println!("part two: {:?}", part_two(&inst));
 }
 
-fn part_one(instructions: Vec<Inst>) -> i64 {
+fn part_one(instructions: &Vec<Inst>) -> (i64, usize) {
     let mut map: HashSet<usize> = HashSet::new();
 
     let mut accumulator = 0;
@@ -19,7 +20,7 @@ fn part_one(instructions: Vec<Inst>) -> i64 {
 
     loop {
         if map.contains(&index) {
-            return accumulator;
+            return (accumulator, index);
         }
 
         map.insert(index);
@@ -33,18 +34,38 @@ fn part_one(instructions: Vec<Inst>) -> i64 {
             OP::NOP => {}
         }
         index += 1;
-        if index == instructions.len() {
-            return accumulator;
+        if index + 1 == instructions.len() {
+            return (accumulator, index + 1);
         }
     }
 }
 
+fn part_two(instructions: &Vec<Inst>) -> i64 {
+    let max_len = instructions.len();
+    for (i, _) in instructions
+        .iter()
+        .enumerate()
+        .filter(|(_, inst)| inst.0 == OP::JMP)
+    {
+        let mut new_inst = instructions.clone();
+        new_inst[i].0 = OP::NOP;
+        let (acc, i) = part_one(&new_inst);
+        if i == max_len {
+            return acc;
+        }
+    }
+
+    0
+}
+
+#[derive(Eq, PartialEq, Copy, Clone)]
 enum OP {
     ACC,
     JMP,
     NOP,
 }
 
+#[derive(Eq, PartialEq, Copy, Clone)]
 struct Inst(OP, i64);
 
 impl std::str::FromStr for Inst {
