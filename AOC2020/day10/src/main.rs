@@ -12,12 +12,13 @@ fn main() {
 }
 
 fn part_one(input: Vec<u32>) -> u32 {
-    // 1 jolt because of the adaptor, one because of the device
+    // 1 jolt because of the adaptor, 1 because of the device
     let mut v: [u32; 3] = [1, 0, 1];
-
     for i in 0..input.len() - 1 {
         v[(input[i + 1] - input[i]) as usize - 1] += 1;
     }
-
     v[0] * v[2]
 }
+
+// fn part_two(input: Vec<u32>) {}
+// Guess I can't handle it for now, I'll probably come back to it later
