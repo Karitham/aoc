@@ -19,16 +19,7 @@ defmodule Day1Test do
   end
 
   test "whole test" do
-    v =
-      File.read!("../inputs/day1.txt")
-      |> String.split("\n")
-      |> Enum.map(fn x ->
-        {i, _} = Integer.parse(x)
-        i
-      end)
-      |> Enum.reduce(0, fn x, acc -> acc + Day1.partOne(x) end)
-
-    assert v == 3_216_868
+    v = parse_in() |> Enum.reduce(0, fn x, acc -> acc + Day1.partOne(x) end)
 
     IO.puts("\nPart one: #{v}")
   end
@@ -46,17 +37,14 @@ defmodule Day1Test do
   end
 
   test "part 2" do
-    v =
-      File.read!("../inputs/day1.txt")
-      |> String.split("\n")
-      |> Enum.map(fn x ->
-        {i, _} = Integer.parse(x)
-        i
-      end)
-      |> Enum.reduce(0, fn x, acc -> acc + Day1.partTwo(x) end)
-
-    assert v == 4_822_435
+    v = parse_in() |> Enum.reduce(0, fn x, acc -> acc + Day1.partTwo(x) end)
 
     IO.puts("\nPart two: #{v}")
+  end
+
+  def parse_in do
+    File.read!("../inputs/day1.txt")
+    |> String.split("\n")
+    |> Enum.map(&String.to_integer/1)
   end
 end
