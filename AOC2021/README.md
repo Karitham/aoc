@@ -18,3 +18,5 @@ You can find the Advent Of Code website [here](https://adventofcode.com/2021).
 | day0602 | Y       |
 | day0701 | Y       |
 | day0702 | Y       |
+| day0801 | Y       |
+| day0802 | Y       |
