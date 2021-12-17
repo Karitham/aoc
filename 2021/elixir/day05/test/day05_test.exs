@@ -15,7 +15,7 @@ defmodule Day05Test do
   end
 
   defp input do
-    File.read!("../inputs/day05.txt") |> String.split("\n", trim: true)
+    File.read!("../../inputs/day05.txt") |> String.split("\n", trim: true)
   end
 
   test "part one instructions" do

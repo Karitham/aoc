@@ -51,7 +51,7 @@ forward 2"
   end
 
   def parse_in() do
-    File.read!("../inputs/day02.txt")
+    File.read!("../../inputs/day02.txt")
     |> String.split("\n", trim: true)
     |> Enum.map(&Day02.parse_mv/1)
   end

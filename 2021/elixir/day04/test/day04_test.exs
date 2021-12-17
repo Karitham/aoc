@@ -70,7 +70,9 @@ defmodule Day04Test do
   end
 
   test "part one" do
-    [inpts | bd] = File.read!("../inputs/day04.txt") |> String.split(~r/[\r\n]{2,}/, trim: true)
+    [inpts | bd] =
+      File.read!("../../inputs/day04.txt") |> String.split(~r/[\r\n]{2,}/, trim: true)
+
     inputs = inpts |> String.split(",")
 
     boards =
@@ -162,7 +164,9 @@ defmodule Day04Test do
   end
 
   test "part two" do
-    [inpts | bd] = File.read!("../inputs/day04.txt") |> String.split(~r/[\r\n]{2,}/, trim: true)
+    [inpts | bd] =
+      File.read!("../../inputs/day04.txt") |> String.split(~r/[\r\n]{2,}/, trim: true)
+
     inputs = inpts |> String.split(",")
 
     boards =

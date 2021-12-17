@@ -4,7 +4,8 @@ defmodule Day07Test do
   defp inst, do: "16,1,2,0,4,2,7,1,2,14" |> String.split(",") |> Enum.map(&String.to_integer/1)
 
   defp input,
-    do: File.read!("../inputs/day07.txt") |> String.split(",") |> Enum.map(&String.to_integer/1)
+    do:
+      File.read!("../../inputs/day07.txt") |> String.split(",") |> Enum.map(&String.to_integer/1)
 
   test "part one instructions", do: assert(inst() |> Day07.min_sum() == 37)
   test "part one", do: IO.puts("part one: #{input() |> Day07.min_sum()}")

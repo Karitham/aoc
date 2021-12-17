@@ -6,7 +6,7 @@ defmodule Day06Test do
   end
 
   defp input do
-    File.read!("../inputs/day06.txt") |> String.split(",") |> Enum.map(&String.to_integer/1)
+    File.read!("../../inputs/day06.txt") |> String.split(",") |> Enum.map(&String.to_integer/1)
   end
 
   test "part one instructions", do: assert(Day06.fish_in_days(inst(), 80) == 5934)

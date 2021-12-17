@@ -51,7 +51,7 @@ defmodule Day01Test do
   end
 
   def parse_in do
-    File.read!("../inputs/day01.txt")
+    File.read!("../../inputs/day01.txt")
     |> String.split("\n", trim: true)
     |> Enum.map(&String.to_integer/1)
   end

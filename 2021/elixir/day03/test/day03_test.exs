@@ -44,7 +44,7 @@ defmodule Day03Test do
 
   test "part one" do
     v =
-      File.read!("../inputs/day03.txt")
+      File.read!("../../inputs/day03.txt")
       |> String.split("\n")
       |> Enum.map(&String.graphemes/1)
       |> Enum.zip()
@@ -74,7 +74,7 @@ defmodule Day03Test do
 
   test "part two" do
     inst =
-      File.read!("../inputs/day03.txt")
+      File.read!("../../inputs/day03.txt")
       |> String.split("\n")
 
     v_ogr = inst |> Day03.find_closest_prefix_ogr() |> to_string()

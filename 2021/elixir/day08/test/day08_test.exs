@@ -19,7 +19,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
   end
 
   defp input() do
-    File.read!("../inputs/day08.txt")
+    File.read!("../../inputs/day08.txt")
     |> String.split("\n")
     |> Enum.map(fn v ->
       String.split(v, "|")
