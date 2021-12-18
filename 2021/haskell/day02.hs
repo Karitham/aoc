@@ -13,12 +13,10 @@ partTwo (x, y, aim) ("up", inst) = (x, y, aim - inst)
 partTwo _ _ = error "This is not a valid instruction"
 
 parse :: String -> [(String, Int)]
-parse = map ((\x -> (head x, read (last x) :: Int)) . words) . lines
+parse = map ((\x -> (head x, read $ last x)) . words) . lines
 
 main :: IO ()
 main = do
   inp <- readFile "../inputs/day02.txt"
-  let (x, y) = foldl partOne (0, 0) (parse inp)
-  printf "part one: %d\n" (x * y)
-  let (x, y, _) = foldl partTwo (0, 0, 0) (parse inp)
-  printf "part two: %d\n" (x * y)
+  printf "part one: %d\n" $ uncurry (*) $ foldl partOne (0, 0) $ parse inp
+  printf "part two: %d\n" $ (\(x, y, _) -> x * y) $ foldl partTwo (0, 0, 0) $ parse inp
