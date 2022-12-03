@@ -19,7 +19,7 @@ pub fn main() !void {
             const b = lines.next().?;
             const c = lines.next().?;
 
-            sum += group(.{ a, b, c });
+            sum += group(&.{ a, b, c });
         }
         break :x sum;
     };
@@ -40,13 +40,12 @@ fn wrong(line: []const u8) usize {
     return (r1.findFirstSet() orelse 0) + 1;
 }
 
-fn group(lines: [3][]const u8) usize {
+fn group(lines: []const []const u8) usize {
     var r1 = toRugSack(lines[0]);
-    const r2 = toRugSack(lines[1]);
-    const r3 = toRugSack(lines[2]);
-
-    r1.setIntersection(r2);
-    r1.setIntersection(r3);
+    for (lines[1..]) |line| {
+        const r2 = toRugSack(line);
+        r1.setIntersection(r2);
+    }
 
     // starts at 1 because we 0-indexed the rug sack
     return (r1.findFirstSet() orelse 0) + 1;
