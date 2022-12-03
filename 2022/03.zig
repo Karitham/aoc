@@ -54,7 +54,18 @@ fn group(lines: [3][]const u8) usize {
 
 // priority returns priority - 1 (0-indexed)
 fn priority(l: u8) u32 {
-    return if (l >= 'a' and l <= 'z') l - 'a' else l - 'A' + 26;
+    const lookupTable = comptime init: {
+        var slice: [256]u32 = undefined;
+        for (slice) |*v, i| v.* = if (i >= 'a' and i <= 'z')
+            i - 'a'
+        else if (i >= 'A' and i <= 'Z')
+            i - 'A' + 26
+        else
+            0;
+        break :init slice;
+    };
+
+    return lookupTable[l];
 }
 
 fn splitHalf(comptime T: type, slice: []const T) [2][]const T {
