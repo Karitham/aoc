@@ -4,14 +4,17 @@ const input = @embedFile("03.input");
 pub fn main() !void {
     var lines = std.mem.split(u8, input, "\n");
 
+    const part1T = std.time.microTimestamp();
     var partOne: usize = x: {
         var sum: usize = 0;
         while (lines.next()) |line| sum += wrong(line);
         break :x sum;
     };
+    const part1D = std.time.microTimestamp() - part1T;
 
     lines.reset();
 
+    const part2T = std.time.microTimestamp();
     var partTwo: usize = x: {
         var sum: usize = 0;
         while (true) {
@@ -23,9 +26,13 @@ pub fn main() !void {
         }
         break :x sum;
     };
+    const part2D = std.time.microTimestamp() - part2T;
 
     std.debug.print("part 1: {any}\n", .{partOne});
     std.debug.print("part 2: {any}\n", .{partTwo});
+
+    std.debug.print("part 1 took {any}us to run\n", .{part1D});
+    std.debug.print("part 2 took {any}us to run\n", .{part2D});
 }
 
 fn wrong(line: []const u8) usize {
@@ -54,7 +61,18 @@ fn group(lines: [3][]const u8) usize {
 
 // priority returns priority - 1 (0-indexed)
 fn priority(l: u8) u32 {
-    return if (l >= 'a' and l <= 'z') l - 'a' else l - 'A' + 26;
+    const lookupTable = comptime init: {
+        var slice: [256]u32 = undefined;
+        for (slice) |*v, i| v.* = if (i >= 'a' and i <= 'z')
+            i - 'a'
+        else if (i >= 'A' and i <= 'Z')
+            i - 'A' + 26
+        else
+            0;
+        break :init slice;
+    };
+
+    return lookupTable[l];
 }
 
 fn splitHalf(comptime T: type, slice: []const T) [2][]const T {
