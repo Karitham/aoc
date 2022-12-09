@@ -1,6 +1,103 @@
 const std = @import("std");
+const input = @embedFile("07.input");
 
-pub fn main() !void {}
+pub fn main() !void {
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+
+    var alloc = arena.allocator();
+
+    var lines = std.mem.split(u8, input, "\n");
+
+    // parse input into list of statements
+    var statements = std.ArrayListUnmanaged(Statement){};
+    defer statements.deinit(alloc);
+    while (lines.next()) |line| {
+        try statements.append(alloc, Statement.parse(line));
+    }
+
+    // create root folder
+    var root = Folder{
+        .name = "/",
+    };
+
+    // execute statements
+    var current_folder = &root;
+
+    // construct a tree of folders
+    for (statements.items) |statement| {
+        switch (statement) {
+            .command => |cmd| {
+                switch (cmd) {
+                    .cd => |cd| {
+                        if (std.mem.eql(u8, cd.dir, "..")) {
+                            current_folder = &root;
+                        } else {
+                            for (current_folder.entries.items) |*entry| {
+                                if (std.mem.eql(u8, entry.name(), cd.dir)) {
+                                    current_folder = &entry.Folder;
+                                    break;
+                                }
+                            }
+                        }
+                    },
+                    .ls => {},
+                }
+            },
+            .entry => |entry| {
+                try current_folder.append(alloc, entry);
+            },
+        }
+    }
+
+    // printTree(root, 0);
+    try std.json.stringify(
+        root,
+        std.json.StringifyOptions{},
+        std.io.getStdOut().writer(),
+    );
+
+    const total_size = findSub(root, 100000);
+    _ = total_size;
+    // std.debug.print("total size: {}\n", .{total_size});
+}
+
+fn findSub(root: Folder, max_size: usize) usize {
+    var total_size: usize = 0;
+    for (root.entries.items) |entry| {
+        switch (entry) {
+            .Folder => |folder| {
+                total_size += findSub(folder, max_size);
+                if (folder.size() <= max_size and folder.size() > 0) {
+                    total_size += folder.size();
+                }
+            },
+            .File => {},
+        }
+    }
+    return total_size;
+}
+
+// printTree prints the tree by recursively calling itself such that the tree is indentated
+fn printTree(folder: Folder, indent: usize) void {
+    var i: usize = 0;
+    while (i < indent) : (i += 1) {
+        std.debug.print("\t", .{});
+    }
+    std.debug.print("{}\n", .{folder});
+
+    for (folder.entries.items) |entry| {
+        i = 0;
+        while (i < indent) : (i += 1) {
+            std.debug.print("\t", .{});
+        }
+
+        switch (entry) {
+            .Folder => |f| printTree(f, indent + 1),
+            .File => |f| std.debug.print("{}\n", .{f}),
+        }
+    }
+}
 
 const CdCMD = struct {
     dir: []const u8,
@@ -26,10 +123,10 @@ const Command = union(enum) {
         if (std.mem.eql(u8, cmd, "cd")) {
             return Command{ .cd = CdCMD.parse(line) };
         } else if (std.mem.eql(u8, line_it.rest(), "ls")) {
-            return Command{.ls};
+            return .ls;
         }
 
-        unreachable;
+        std.debug.panic("panic {s}", .{line});
     }
 };
 
@@ -68,11 +165,7 @@ const Folder = struct {
     }
 
     pub fn format(self: Folder, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
-        try std.fmt.format(writer, "{s} ({} bytes)\n", .{ self.name, self.size() });
-
-        for (self.entries.items) |entry| {
-            try std.fmt.format(writer, " {s}\n", .{entry});
-        }
+        try std.fmt.format(writer, "{s} (dir, size={d})", .{ self.name, self.size() });
     }
 };
 
@@ -90,7 +183,7 @@ const File = struct {
     }
 
     pub fn format(self: File, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
-        try std.fmt.format(writer, "{d} {s}", .{ self.size, self.name });
+        try std.fmt.format(writer, "{s} (file, size={})", .{ self.name, self.size });
     }
 };
 
@@ -129,10 +222,10 @@ const Entry = union(enum) {
         };
     }
 
-    pub fn format(self: Entry, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
+    fn format(self: Entry, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
         return switch (self) {
-            .Folder => |folder| std.fmt.format(writer, "{s}", .{folder}),
-            .File => |file| std.fmt.format(writer, "{s}", .{file}),
+            .Folder => |f| std.fmt.format(writer, "{}", .{f}),
+            .File => |f| std.fmt.format(writer, "{}", .{f}),
         };
     }
 };
@@ -145,10 +238,10 @@ const Statement = union(enum) {
         var it = std.mem.tokenize(u8, line, " ");
         const peek = it.peek().?;
 
-        return if (std.mem.eql(u8, peek, "$"))
-            Statement{ .command = Command.parse(line) }
-        else
-            Statement{ .entry = Entry.parse(line) };
+        return if (std.mem.eql(u8, peek, "$")) x: {
+            _ = it.next().?;
+            break :x Statement{ .command = Command.parse(it.rest()) };
+        } else Statement{ .entry = Entry.parse(line) };
     }
 };
 
