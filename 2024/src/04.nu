@@ -101,3 +101,34 @@ def 2d_sliding_window [n: int, closure: closure] list<list<any>> -> list<any> {
     
     $window_results
 }
+
+# Different part_one solution that I like more but is even slower (up to 3 minutes total runtime???)
+# def part_one [grid: list<list<string>>] -> int {
+#     const word = "XMAS" | split chars
+
+#     def isXMAS [
+#         grid: list<list<string>>
+#         x: int,
+#         y: int,
+#         dir: list<int>, # directions to move towards
+#         matched: int,
+#     ] -> bool {
+#         $matched == 4 or (
+#             $x >= 0 and $x < ($grid | length) and
+#             $y >= 0 and $y < ($grid | get $x | length) and
+#             (($grid | get $x | get $y) == ($word | get $matched)) and
+#             (isXMAS $grid ($x + $dir.0) ($y + $dir.1) $dir ($matched + 1))
+#         )
+#     }
+
+#     # traverse the grid and for each "X", look whether it's XMAS
+#     $grid | enumerate | each {|row|
+#         $row.item | enumerate | each {|col|
+#             if ($col.item != "X") {return 0}
+#             [[-1, -1] [0, -1] [1, -1] [1, 0] [1, 1] [0, 1] [-1, 1] [-1, 0]] | reduce -f 0 {|dir, acc|
+#                 $acc + (if (isXMAS $grid $row.index $col.index $dir 0) {1} else {0})
+#             }
+#         } | math sum
+#     } | math sum
+# }
+
