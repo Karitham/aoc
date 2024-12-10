@@ -12,7 +12,7 @@
       pkgs = import nixpkgs {inherit system;};
     in {
       devShells.default = pkgs.mkShell {
-        packages = with pkgs; [nushell];
+        packages = with pkgs; [nushell python3 ruff];
       };
     });
 }
