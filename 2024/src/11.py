@@ -12,24 +12,24 @@ def solve(stones: list[int], it: int = 25) -> int:
         return digits_len(v // 10) + 1
 
     @cache
-    def process_number(s: int) -> tuple[int, int | None]:
-        dl = digits_len(s)
-        if s == 0:
-            return (1, None)
+    def process_stone(stone: int, depth: int) -> int:
+        if depth == it:
+            return 1
+
+        dl = digits_len(stone)
+        if stone == 0:
+            new_val, remainder = (1, None)
         elif dl % 2 == 0:
             half = 10 ** (dl // 2)
-            return (s // half, s % half)
+            new_val, remainder = (stone // half, stone % half)
         else:
-            return (s * 2024, None)
+            new_val, remainder = (stone * 2024, None)
 
-    result = [s for s in stones]
-    for _ in range(it):
-        for i, s in enumerate(result[: len(result)]):
-            new_val, remainder = process_number(s)
-            result[i] = new_val
-            if remainder is not None:
-                result.append(remainder)
-    return len(result)
+        if remainder is None:
+            return process_stone(new_val, depth + 1)
+        return process_stone(new_val, depth + 1) + process_stone(remainder, depth + 1)
+
+    return sum(process_stone(stone, 0) for stone in stones)
 
 
 def main():
