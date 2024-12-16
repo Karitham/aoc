@@ -3,7 +3,7 @@ import sys
 
 
 directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-type Pos = tuple[int, int]
+type Pos = tuple[int, int, int]
 type Grid = list[list[str]]
 
 
@@ -14,31 +14,31 @@ def print_grid(g: Grid):
 def print_grid_with_path(g: Grid, path: list[tuple[int, int]]):
     grid_copy = [row[:] for row in g]
     for row, col in path:
-        if grid_copy[row][col] not in ["S", "E"]:
-            grid_copy[row][col] = "O"
+        grid_copy[row][col] = "O"
     print_grid(grid_copy)
 
 
-def find(grid: Grid, letter: str) -> tuple[int, int]:
-    return next((i, row.index(letter)) for i, row in enumerate(grid) if letter in row)
+def find(grid: Grid, letter: str) -> tuple[int, int, int]:
+    pos = next((i, row.index(letter)) for i, row in enumerate(grid) if letter in row)
+    return (pos[0], pos[1], 0)
 
 
-def find_optimal_path(grid: Grid) -> tuple[list[tuple[tuple[int, int], int]], int]:
+def find_optimal_path(
+    grid: Grid,
+) -> tuple[list[tuple[tuple[int, int, int], int]], int]:
     start = find(grid, "S")
     end = find(grid, "E")
-    rows = len(grid)
-    cols = len(grid[0])
     visited = {}
-    queue = [(start, 0, (0, 1), [(start, 0)])]
-    first_optimal = None
+    queue = [(start, 0, [(start, 0)])]
     min_cost = float("inf")
 
     while queue:
-        pos, cost, last_dir, path = queue.pop(0)
+        pos, cost, path = queue.pop(0)
         if pos is None:
             continue
-        row, col = pos
-        if pos == end:
+
+        row, col, last_dir = pos
+        if (row, col) == (end[0], end[1]):
             if cost < min_cost:
                 min_cost = cost
                 first_optimal = path
@@ -46,69 +46,55 @@ def find_optimal_path(grid: Grid) -> tuple[list[tuple[tuple[int, int], int]], in
         if pos in visited and visited[pos] <= cost:
             continue
         visited[pos] = cost
-        for dr, dc in directions:
+        for dir_idx, (dr, dc) in enumerate(directions):
             new_row, new_col = row + dr, col + dc
-            new_dir = (dr, dc)
-            if (
-                0 <= new_row < rows
-                and 0 <= new_col < cols
-                and grid[new_row][new_col] != "#"
-            ):
-                # turn + move
-                new_cost = cost + (
-                    1 if new_dir == last_dir or last_dir is None else 1001
-                )
-
+            if grid[new_row][new_col] != "#":
+                new_cost = cost + (1 if dir_idx == last_dir else 1001)
                 if new_cost < min_cost:
-                    new_path = path + [((new_row, new_col), new_cost)]
-                    queue.append(((new_row, new_col), new_cost, new_dir, new_path))
+                    new_pos = (new_row, new_col, dir_idx)
+                    new_path = path + [(new_pos, new_cost)]
+                    queue.append((new_pos, new_cost, new_path))
 
     return first_optimal, min_cost
 
 
 def find_branch_paths(
-    grid: Grid, optimal: list[tuple[tuple[int, int], int]], best: int
+    grid: Grid, optimal: list[tuple[tuple[int, int, int], int]], best: int
 ) -> list[tuple[int, int]]:
-    all_optimal_positions = set(pos for pos, _ in optimal)
+    all_optimal_positions = set((x, y) for (x, y, _), _ in optimal)
     optimal_costs = {pos: cost for pos, cost in optimal}
-    rejected = {}
+    dir_visited = {}
 
-    def is_valid(row: int, col: int) -> bool:
-        return grid[row][col] != "#"
+    def explore(pos: Pos, cost: int, visited: dict[tuple[int, int], int]) -> None:
+        base_pos = (pos[0], pos[1])
 
-    def explore(
-        pos: Pos, cost: int, last_dir: tuple[int, int], visited: dict[Pos, int]
-    ) -> None:
-        if (pos, last_dir) in rejected and cost >= rejected[(pos, last_dir)]:
+        if pos in optimal_costs:
+            if cost <= optimal_costs[pos]:
+                all_optimal_positions.update(visited.keys())
+                all_optimal_positions.add(base_pos)
+                return
+        if pos in dir_visited and cost > dir_visited[pos]:
             return
 
-        if pos in visited and visited[pos] <= cost:
-            if pos not in optimal_costs:
-                rejected[(pos, last_dir)] = cost
-            return
+        dir_visited[pos] = cost
+        visited[base_pos] = cost
 
-        visited[pos] = cost
-        row, col = pos
+        row, col, last_dir = pos
+        for dir_idx, (dr, dc) in enumerate(directions):
+            next_pos = (row + dr, col + dc, dir_idx)
+            if grid[next_pos[0]][next_pos[1]] != "#":
+                new_cost = cost + (1 if dir_idx == last_dir else 1001)
 
-        if pos in optimal_costs and cost == optimal_costs[pos]:
-            all_optimal_positions.update(visited)
-            return
-
-        for dr, dc in directions:
-            next_pos = (row + dr, col + dc)
-            if is_valid(*next_pos):
-                new_cost = cost + (1 if (dr, dc) == last_dir else 1001)
                 if new_cost <= best:
-                    explore(next_pos, new_cost, (dr, dc), visited.copy())
+                    explore(next_pos, new_cost, visited.copy())
 
-    start = find(grid, "S")
-    explore(start, 0, None, {})
+    for pos, cost in optimal:
+        row, col, _ = pos
+        for new_dir_idx, (dr, dc) in enumerate(directions):
+            next_pos = (row + dr, col + dc, new_dir_idx)
+            if grid[next_pos[0]][next_pos[1]] != "#" and next_pos not in optimal_costs:
+                explore(next_pos, cost + 1, {(row, col): cost})
 
-    for (row, col), cost in optimal:
-        for dr, dc in directions:
-            next_pos = (row + dr, col + dc)
-            if is_valid(*next_pos) and next_pos not in optimal_costs:
-                explore(next_pos, cost + 1, (dr, dc), {(row, col): cost})
     return all_optimal_positions
 
 
