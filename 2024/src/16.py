@@ -71,52 +71,44 @@ def find_branch_paths(
 ) -> list[tuple[int, int]]:
     all_optimal_positions = set(pos for pos, _ in optimal)
     optimal_costs = {pos: cost for pos, cost in optimal}
-    rejected_paths: dict[tuple[Pos, tuple[int, int] | None], int] = {}
+    rejected = {}
 
     def is_valid(row: int, col: int) -> bool:
         return grid[row][col] != "#"
 
     def explore(
-        pos: Pos, cost: int, last_dir: tuple[int, int] | None, visited: dict[Pos, int]
+        pos: Pos, cost: int, last_dir: tuple[int, int], visited: dict[Pos, int]
     ) -> None:
-        if cost > best:
-            rejected_paths[(pos, last_dir)] = cost
-            return
-        state = (pos, last_dir)
-        if state in rejected_paths and cost >= rejected_paths[state]:
+        if (pos, last_dir) in rejected and cost >= rejected[(pos, last_dir)]:
             return
 
-        if pos in visited and visited[pos] <= cost and pos not in optimal_costs:
-            rejected_paths[state] = cost
+        if pos in visited and visited[pos] <= cost:
+            if pos not in optimal_costs:
+                rejected[(pos, last_dir)] = cost
             return
 
         visited[pos] = cost
         row, col = pos
 
         if pos in optimal_costs and cost == optimal_costs[pos]:
-            all_optimal_positions.update(visited.keys())
+            all_optimal_positions.update(visited)
             return
 
         for dr, dc in directions:
             next_pos = (row + dr, col + dc)
-            if not is_valid(next_pos[0], next_pos[1]):
-                continue
-
-            new_cost = cost + (1 if (dr, dc) == last_dir or last_dir is None else 1001)
-
-            if new_cost <= best:
-                explore(next_pos, new_cost, (dr, dc), visited.copy())
+            if is_valid(*next_pos):
+                new_cost = cost + (1 if (dr, dc) == last_dir else 1001)
+                if new_cost <= best:
+                    explore(next_pos, new_cost, (dr, dc), visited.copy())
 
     start = find(grid, "S")
     explore(start, 0, None, {})
 
-    for pos, cost in optimal:
-        row, col = pos
+    for (row, col), cost in optimal:
         for dr, dc in directions:
             next_pos = (row + dr, col + dc)
-            if is_valid(next_pos[0], next_pos[1]) and next_pos not in optimal_costs:
-                explore(next_pos, cost + 1, (dr, dc), {pos: cost})
-
+            if is_valid(*next_pos) and next_pos not in optimal_costs:
+                explore(next_pos, cost + 1, (dr, dc), {(row, col): cost})
     return all_optimal_positions
 
 
