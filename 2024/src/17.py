@@ -39,21 +39,18 @@ def run(regs: list[int], inst: list[int]) -> list[int]:
     return outv
 
 
-def search(inst: list[int], i: int = 0, r0: int = 0) -> int | None:
-    # Try 8 different possibilities for the current position
-    for _ in range(8):
+def search(inst: list[int], i: int, r0: int = 0) -> int | None:
+    # Try all possibilities for the current position
+    for bit in range(8):
+        nr0 = r0 | (bit << (3 * i))
         # Run the program with current r0 value and check output
-        result = run([r0, 0, 0], inst)
+        result = run([nr0, 0, 0], inst)
         # If output length matches instruction length and current position matches
         if i < len(result) and result[i] == inst[i]:
-            # If we're at the last position, we found the answer
-            if i == len(inst) - 1:
-                return r0
-            else:
-                # Recursively search for later positions
-                print(f"found {result} with {r0} for {inst}")
-                return search(inst, i + 1, r0)
-        r0 = r0 + (1 << 3 * (i + 1))
+            if i == 0:
+                return nr0
+            if found := search(inst, i - 1, nr0):
+                return found
     return None
 
 
@@ -62,7 +59,9 @@ def main():
     regs = [int(re.findall(r"\d+", line)[0]) for line in parts[0].splitlines()]
     inst = [int(x) for x in parts[1].strip("Program: ").split(",")]
 
-    r0_bits = search(inst)
+    r0_bits = search(inst, len(inst) - 1)
+    if r0_bits:
+        print(run([r0_bits, 0, 0], inst))
     print(f"part_one: '{",".join(map(str, run(regs, inst)))}', part_two: '{r0_bits}'")
 
 
