@@ -35,15 +35,20 @@ def main():
         for line in sys.stdin.read().strip().splitlines()
     ]
 
-    pathAt = bfs((0, 0), (70, 70), (70, 70), set(obstacles[:1024]))
-    lastInvalid = (0, 0)
-    for i in range(len(obstacles)):
-        obst = obstacles[: len(obstacles) - 1 - i]
-        if bfs((0, 0), (70, 70), (70, 70), set(obst)):
-            # this one got through, so the lastInvalid is
-            lastInvalid = obstacles[len(obstacles) - i - 1]
-            break
-    print(f"part_one: '{pathAt}', part_two: '{lastInvalid[0]},{lastInvalid[1]}'")
+    part_one = bfs((0, 0), (70, 70), (70, 70), set(obstacles[:1024]))
+
+    # Binary search to find last invalid obstacle
+    left, right = 0, len(obstacles) - 1
+    last_invalid = (0, 0)
+    while left <= right:
+        mid = (left + right) // 2
+        if bfs((0, 0), (70, 70), (70, 70), set(obstacles[:mid])):
+            left = mid + 1
+        else:
+            last_invalid = obstacles[mid - 1]
+            right = mid - 1
+
+    print(f"part_one: '{part_one}', part_two: '{last_invalid[0]},{last_invalid[1]}'")
 
 
 if __name__ == "__main__":
